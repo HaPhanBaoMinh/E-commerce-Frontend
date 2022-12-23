@@ -17,6 +17,7 @@ import { resetCartData } from '../../action/cartReducerAction'
 import { Link } from 'react-router-dom'
 import { io } from "socket.io-client";
 import isObjectEmpty from '../../utils/function/isEmptyObject';
+import Loading from "../../pages/Loading/Loading"
 
 function CheckoutInfo() {
     const [checkoutStep, setcheckoutStep] = useState(1);
@@ -41,6 +42,8 @@ function CheckoutInfo() {
     const [isNewAddress, setIsNewAddress] = useState(false);
     const [isSuccess, setisSuccess] = useState(false);
     const userInfo = useSelector(state => state.userInfo);
+    const [isLoading, setIsLoading] = useState(false);
+
 
     const toastOption = {
         position: "bottom-right",
@@ -117,11 +120,16 @@ function CheckoutInfo() {
                 items: cartList,
                 address_id: addressid
             }
+            setIsLoading(true);
             const { data } = await axios.post(`${ROUTE}/api/orders`, body);
+
+            if (data.status) {
+                setIsLoading(false);
+                setisSuccess(true);
+            }
 
             if (socket.current) {
                 socket.current.emit("add-new-order", body);
-                setisSuccess(true);
                 dispath(resetCartData())
             }
 
@@ -149,6 +157,12 @@ function CheckoutInfo() {
         if (checkoutStep > 1) {
             setcheckoutStep(pre => pre - 1);
         }
+    }
+
+    if (isLoading) {
+        return (
+            <Loading />
+        )
     }
 
     return (
