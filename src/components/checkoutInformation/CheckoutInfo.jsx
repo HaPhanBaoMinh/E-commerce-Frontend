@@ -125,7 +125,10 @@ function CheckoutInfo() {
 
             if (data.status) {
                 setIsLoading(false);
-                setisSuccess(true);
+                // setisSuccess(true);
+                toast.success('Order successful!', toastOption)
+            } else {
+                toast.error('Order error!', toastOption)
             }
 
             if (socket.current) {
